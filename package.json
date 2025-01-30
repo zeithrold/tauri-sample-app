@@ -1,0 +1,33 @@
+{
+  "name": "tauri-sample-app",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vinxi dev",
+    "build": "vinxi build",
+    "start": "vinxi start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.0.0+sha512.b8fef5494bd3fe4cbd4edabd0745df2ee5be3e4b0b8b08fa643aa3e4c6702ccc0f00d68fa8a8c9858a735a0032485a44990ed2810526c875e416f001b17df12b",
+  "dependencies": {
+    "@solidjs/start": "^1.0.11",
+    "solid-js": "^1.9.4"
+  },
+  "devDependencies": {
+    "@una-ui/extractor-vue-script": "0.35.0-beta.1",
+    "@una-ui/preset": "0.35.0-beta.1",
+    "typescript": "^5.7.3",
+    "unocss": "^65.4.3",
+    "vite": "^6.0.11"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild"
+    ]
+  }
+}
