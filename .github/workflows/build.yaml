@@ -69,7 +69,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: runner.os == 'macOS'
         with:
-          name: App-${{ runner.os }}-${{ runner.arch }}-DMG
+          name: App-${{ runner.os }}-${{ matrix.args == '--target aarch64-apple-darwin' && 'ARM64' || 'X64' }}-DMG
           path: ./src-tauri/target/*/release/bundle/dmg/*.dmg
       
       - name: Upload Artifact (Linux, DEB)
@@ -84,13 +84,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: App-${{ runner.os }}-${{ runner.arch }}-AppImage
-          path: ./src-tauri/target/release/bundle/**/*.AppImage(.sig)
+          path: ./src-tauri/target/release/bundle/**/*.AppImage
       
       - name: Upload Artifact (Linux, RPM)
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
-          name: App-${{ runner.os }}-${{ runner.arch }}}-RPM
+          name: App-${{ runner.os }}-${{ runner.arch }}-RPM
           path: ./src-tauri/target/release/bundle/**/*.rpm
       
       - name: Upload Artifact (Windows, MSI)
