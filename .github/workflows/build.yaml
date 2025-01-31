@@ -70,49 +70,49 @@ jobs:
       
       - name: Upload Artifact (macOS)
         uses: actions/upload-artifact@v4
-        if: matrix.platform == 'macos-latest'
+        if: runner.os == 'macOS'
         with:
-          name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-DMG
+          name: App-${{ runner.os }}-${{ runner.arch }}-DMG
           path: ./src-tauri/target/release/bundle/dmg/*.dmg
       
-      - name: Upload Artifact (Linux, RPM)
-        if: matrix.platform == 'ubuntu-22.04' || matrix.platform == 'ubuntu-22.04-arm'
+      - name: Upload Artifact (Linux, DEB)
+        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
-          name: App-${{ vars.RUNNER_OS }}-${{ vars.RUNNER_ARCH }}-DEB
+          name: App-${{ runner.os }}-${{ runner.arch }}-DEB
           path: ./src-tauri/target/release/bundle/**/*.deb
       
       - name: Upload Artifact (Linux, AppImage)
-        if: matrix.platform == 'ubuntu-22.04' || matrix.platform == 'ubuntu-22.04-arm'
+        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
-          name: App-${{ vars.RUNNER_OS }}-${{ vars.RUNNER_ARCH }}-AppImage
+          name: App-${{ runner.os }}-${{ runner.arch }}-AppImage
           path: ./src-tauri/target/release/bundle/**/*.AppImage(.sig)
       
       - name: Upload Artifact (Linux, RPM)
-        if: matrix.platform == 'ubuntu-22.04' || matrix.platform == 'ubuntu-22.04-arm'
+        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
-          name: App-${{ vars.RUNNER_OS }}-${{ vars.RUNNER_ARCH }}-RPM
+          name: App-${{ runner.os }}-${{ runner.arch }}}-RPM
           path: ./src-tauri/target/release/bundle/**/*.rpm
       
       - name: Upload Artifact (Windows, MSI)
-        if: matrix.platform == 'windows-latest'
+        if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: App-${{ vars.RUNNER_OS }}-${{ vars.RUNNER_ARCH }}-MSI
+          name: App-${{ runner.os }}-${{ runner.arch }}-MSI
           path: ./src-tauri/target/release/bundle/**/*.msi
       
       - name: Upload Artifact (Windows, NSIS)
-        if: matrix.platform == 'windows-latest'
+        if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: App-${{ vars.RUNNER_OS }}-${{ vars.RUNNER_ARCH }}-NSIS
+          name: App-${{ runner.os }}-${{ runner.arch }}-NSIS
           path: ./src-tauri/target/release/bundle/**/*.exe
 
       - name: Upload Artifact (Windows, EXE)
-        if: matrix.platform == 'windows-latest'
+        if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: App-${{ vars.RUNNER_OS }}-${{ vars.RUNNER_ARCH }}-EXE
+          name: App-${{ runner.os }}-${{ runner.arch }}-EXE
           path: ./src-tauri/target/release/*.exe
