@@ -15,24 +15,20 @@ jobs:
         include:
           - platform: macos-latest # for Arm based macs (M1 and above).
             args: --target aarch64-apple-darwin
-            artifact_platform: macos-arm64
           - platform: macos-latest # for Intel based macs.
             args: --target x86_64-apple-darwin
-            artifact_platform: macos-x86_64
           - platform: ubuntu-22.04
             args: ''
-            artifact_platform: linux-x86_64
           - platform: ubuntu-22.04-arm
             args: ''
-            artifact_platform: linux-arm64
           - platform: windows-latest
             args: ''
-            artifact_platform: windows-x86_64
-
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          path: .
 
       - name: Install dependencies (Ubuntu only)
         if: matrix.platform == 'ubuntu-22.04' || matrix.platform == 'ubuntu-22.04-arm'
@@ -70,13 +66,46 @@ jobs:
         run: pnpm install # change this to npm or pnpm depending on which one you use.
 
       - name: Build Tauri app
-        uses: tauri-apps/tauri-action@v0
-        id: tauri_build
+        run: pnpm build ${{ matrix.args }}
+      
+      - name: Upload Artifact (macOS)
+        uses: actions/upload-artifact@v4
         with:
-          args: ${{ matrix.args }}
+          name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-DMG
+          path: ./src-tauri/target/release/bundle/**/*.dmg
+      
+      - name: Upload Artifact (Linux, RPM)
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-DEB
+          path: ./src-tauri/target/release/bundle/**/*.deb
+      
+      - name: Upload Artifact (Linux, AppImage)
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-AppImage
+          path: ./src-tauri/target/release/bundle/**/*.AppImage(.sig)
+      
+      - name: Upload Artifact (Linux, RPM)
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-RPM
+          path: ./src-tauri/target/release/bundle/**/*.rpm
+      
+      - name: Upload Artifact (Windows, MSI)
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-MSI
+          path: ./src-tauri/target/release/bundle/**/*.msi
+      
+      - name: Upload Artifact (Windows, NSIS)
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-NSIS
+          path: ./src-tauri/target/release/bundle/**/*.exe
 
-      - uses: actions/upload-artifact@v4
-        name: Upload artifact
+      - name: Upload Artifact (Windows, EXE)
+        uses: actions/upload-artifact@v4
         with:
-          name: tauri-artifact-${{ matrix.artifact_platform }}
-          path: ${{ steps.tauri_build.outputs.artifactPaths }}
+          name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-EXE
+          path: ./src-tauri/target/release/*.exe
