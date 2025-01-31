@@ -79,3 +79,4 @@ jobs:
         name: Upload artifact
         with:
           name: tauri-artifact-${{ matrix.artifact_platform }}
+          path: ${{ steps.tauri_build.outputs.artifactPaths }}
