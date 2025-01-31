@@ -70,7 +70,7 @@ jobs:
         if: runner.os == 'macOS'
         with:
           name: App-${{ runner.os }}-${{ runner.arch }}-DMG
-          path: ./src-tauri/*/release/bundle/dmg/*.dmg
+          path: ./src-tauri/target/*/release/bundle/dmg/*.dmg
       
       - name: Upload Artifact (Linux, DEB)
         if: runner.os == 'Linux'
