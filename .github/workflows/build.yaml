@@ -65,11 +65,11 @@ jobs:
         # If you don't have `beforeBuildCommand` configured you may want to build your frontend here too.
         run: pnpm install # change this to npm or pnpm depending on which one you use.
 
-      - name: Debug
-        run: ls -la
-
       - name: Build Tauri app
         run: pnpm build ${{ matrix.args }}
+
+      - name: Debug
+        run: pnpm --package=tree-cli dlx tree -l 4 --ignore node_modules
 
       - name: Upload Artifact (macOS)
         uses: actions/upload-artifact@v4
