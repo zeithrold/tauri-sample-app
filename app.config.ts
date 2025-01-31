@@ -1,7 +1,8 @@
 import { defineConfig } from '@solidjs/start/config'
-import devtools from 'solid-devtools/vite'
-import unocss from 'unocss/vite'
-import autoimport from 'unplugin-auto-import/vite'
+import DevTools from 'solid-devtools/vite'
+import UnoCSS from 'unocss/vite'
+import Inspect from 'vite-plugin-inspect'
+import TsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
   ssr: false,
@@ -12,15 +13,13 @@ export default defineConfig({
   },
   vite: {
     plugins: [
-      unocss(),
-      devtools({
+      UnoCSS(),
+      DevTools({
         autoname: true,
         locator: true,
       }),
-      autoimport({
-        imports: ['solid-js'],
-        dts: true,
-      }),
+      TsconfigPaths(),
+      Inspect(),
     ],
   },
 })
