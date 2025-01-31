@@ -31,7 +31,7 @@ jobs:
           path: .
 
       - name: Install dependencies (Ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04' || matrix.platform == 'ubuntu-22.04-arm'
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
@@ -68,6 +68,10 @@ jobs:
       - name: Build Tauri app
         run: pnpm build ${{ matrix.args }}
       
+      - name: (Debug) List files
+        if: runner.os == 'macOS'
+        run: ls -R ./src-tauri/target/release/bundle/dmg
+
       - name: Upload Artifact (macOS)
         uses: actions/upload-artifact@v4
         if: runner.os == 'macOS'
