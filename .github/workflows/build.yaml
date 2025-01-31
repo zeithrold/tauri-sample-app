@@ -70,23 +70,27 @@ jobs:
       
       - name: Upload Artifact (macOS)
         uses: actions/upload-artifact@v4
+        if: env.RUNNER_OS == 'macOS'
         with:
           name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-DMG
           path: ./src-tauri/target/release/bundle/**/*.dmg
       
       - name: Upload Artifact (Linux, RPM)
+        if: env.RUNNER_OS == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-DEB
           path: ./src-tauri/target/release/bundle/**/*.deb
       
       - name: Upload Artifact (Linux, AppImage)
+        if: env.RUNNER_OS == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-AppImage
           path: ./src-tauri/target/release/bundle/**/*.AppImage(.sig)
       
       - name: Upload Artifact (Linux, RPM)
+        if: env.RUNNER_OS == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-RPM
@@ -94,11 +98,13 @@ jobs:
       
       - name: Upload Artifact (Windows, MSI)
         uses: actions/upload-artifact@v4
+        if: env.RUNNER_OS == 'Windows'
         with:
           name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-MSI
           path: ./src-tauri/target/release/bundle/**/*.msi
       
       - name: Upload Artifact (Windows, NSIS)
+        if: env.RUNNER_OS == 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-NSIS
@@ -106,6 +112,7 @@ jobs:
 
       - name: Upload Artifact (Windows, EXE)
         uses: actions/upload-artifact@v4
+        if: env.RUNNER_OS == 'Windows'
         with:
           name: App-${{ env.RUNNER_OS }}-${{ env.RUNNER_ARCH }}-EXE
           path: ./src-tauri/target/release/*.exe
