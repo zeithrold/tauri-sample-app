@@ -65,9 +65,6 @@ jobs:
       - name: Build Tauri app
         run: pnpm build ${{ matrix.args }}
 
-      - name: Debug
-        run: pnpm --package=tree-cli dlx tree -l 4 --ignore node_modules
-
       - name: Upload Artifact (macOS)
         uses: actions/upload-artifact@v4
         if: runner.os == 'macOS'
