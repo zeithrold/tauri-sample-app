@@ -46,8 +46,10 @@ jobs:
         with:
           node-version: 22
           cache: pnpm # Set this to npm, yarn or pnpm.
+          cache-dependency-path: ${{ github.workspace }}/${{ github.repository }}/pnpm-lock.yaml
 
       - name: Install Dependencies
+        working-directory: ${{ github.workspace }}/${{ github.repository }}
         run: pnpm i --frozen-lockfile
 
       - name: Install Rust stable
@@ -59,13 +61,15 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: ./src-tauri -> target
+          workspaces: ${{ github.workspace }}/${{ github.repository }}/src-tauri -> target
 
       - name: Install frontend dependencies
+        working-directory: ${{ github.workspace }}/${{ github.repository }}
         # If you don't have `beforeBuildCommand` configured you may want to build your frontend here too.
         run: pnpm install # change this to npm or pnpm depending on which one you use.
 
       - name: Build Tauri app
+        working-directory: ${{ github.workspace }}/${{ github.repository }}
         run: pnpm build ${{ matrix.args }}
 
       - name: Upload Artifact (macOS)
@@ -73,46 +77,46 @@ jobs:
         if: runner.os == 'macOS'
         with:
           name: App-${{ runner.os }}-${{ runner.arch }}-DMG
-          path: ./src-tauri/target/release/bundle/dmg/*.dmg
+          path: ${{ github.workspace }}/${{ github.repository }}/src-tauri/target/release/bundle/dmg/*.dmg
       
       - name: Upload Artifact (Linux, DEB)
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: App-${{ runner.os }}-${{ runner.arch }}-DEB
-          path: ./src-tauri/target/release/bundle/**/*.deb
+          path: ${{ github.workspace }}/${{ github.repository }}/src-tauri/target/release/bundle/**/*.deb
       
       - name: Upload Artifact (Linux, AppImage)
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: App-${{ runner.os }}-${{ runner.arch }}-AppImage
-          path: ./src-tauri/target/release/bundle/**/*.AppImage(.sig)
+          path: ${{ github.workspace }}/${{ github.repository }}/src-tauri/target/release/bundle/**/*.AppImage(.sig)
       
       - name: Upload Artifact (Linux, RPM)
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: App-${{ runner.os }}-${{ runner.arch }}}-RPM
-          path: ./src-tauri/target/release/bundle/**/*.rpm
+          path: ${{ github.workspace }}/${{ github.repository }}/src-tauri/target/release/bundle/**/*.rpm
       
       - name: Upload Artifact (Windows, MSI)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: App-${{ runner.os }}-${{ runner.arch }}-MSI
-          path: ./src-tauri/target/release/bundle/**/*.msi
+          path: ${{ github.workspace }}/${{ github.repository }}/src-tauri/target/release/bundle/**/*.msi
       
       - name: Upload Artifact (Windows, NSIS)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: App-${{ runner.os }}-${{ runner.arch }}-NSIS
-          path: ./src-tauri/target/release/bundle/**/*.exe
+          path: ${{ github.workspace }}/${{ github.repository }}/src-tauri/target/release/bundle/**/*.exe
 
       - name: Upload Artifact (Windows, EXE)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: App-${{ runner.os }}-${{ runner.arch }}-EXE
-          path: ./src-tauri/target/release/*.exe
+          path: ${{ github.workspace }}/${{ github.repository }}/src-tauri/target/release/*.exe
