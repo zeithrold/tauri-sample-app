@@ -28,7 +28,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          path: .
+          path: ..
 
       - name: Install dependencies (Ubuntu only)
         if: runner.os == 'Linux'
@@ -67,10 +67,6 @@ jobs:
 
       - name: Build Tauri app
         run: pnpm build ${{ matrix.args }}
-      
-      - name: (Debug) List files
-        if: runner.os == 'macOS'
-        run: ls -R ./src-tauri/target/release/bundle/dmg
 
       - name: Upload Artifact (macOS)
         uses: actions/upload-artifact@v4
