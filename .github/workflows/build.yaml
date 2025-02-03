@@ -193,7 +193,7 @@ jobs:
               Components: main restricted multiverse universe
               Architectures: arm64
 
-            " | sudo tee -a /etc/apt/sources.list.d/ubuntu.source
+              " | sudo tee -a /etc/apt/sources.list.d/ubuntu.source
             sudo rm /etc/apt/sources.list
 
       - name: Install Linux Dependencies (X64)
