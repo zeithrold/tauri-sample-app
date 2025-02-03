@@ -188,6 +188,8 @@ jobs:
 
       - name: Install Linux Dependencies (ARM64, Step 2)
         if: matrix.target == 'aarch64-unknown-linux-gnu'
+        env:
+          PKG_CONFIG_PATH: /usr/aarch64-linux-gnu/pkgconfig
         run: |
           sudo apt-get update
           sudo apt-get install -y \
