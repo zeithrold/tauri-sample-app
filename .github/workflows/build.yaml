@@ -188,8 +188,6 @@ jobs:
 
       - name: Install Linux Dependencies (ARM64, Step 2)
         if: matrix.target == 'aarch64-unknown-linux-gnu'
-        env:
-          PKG_CONFIG_PATH: /usr/aarch64-linux-gnu/pkgconfig
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -230,6 +228,7 @@ jobs:
           pnpm build --target ${{ matrix.target }}
         env:
           PKG_CONFIG_SYSROOT_DIR: /usr/aarch64-linux-gnu/
+          PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
           PKG_CONFIG_ALLOW_CROSS: 1
 
       - name: Upload Artifact (Linux, DEB)
