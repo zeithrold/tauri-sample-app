@@ -1,37 +1,24 @@
-name: publish
+name: Build and Upload
+description: Build and upload Tauri app artifacts
+
+permissions:
+  contents: write
 
 on: [push]
 
 jobs:
-  publish-tauri:
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: macos-latest # for Arm based macs (M1 and above).
-            args: --target aarch64-apple-darwin
-          - platform: macos-latest # for Intel based macs.
-            args: --target x86_64-apple-darwin
-          - platform: ubuntu-22.04
-            args: ''
-          - platform: ubuntu-22.04-arm
-            args: ''
-          - platform: windows-latest
-            args: ''
-    runs-on: ${{ matrix.platform }}
+  build-macos:
+    runs-on: macos-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           path: .
 
-      - name: Install dependencies (Ubuntu only)
-        if: runner.os == 'Linux'
+      - name: Prepare Rust Targets
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          rustup target add aarch64-apple-darwin
+          rustup target add x86_64-apple-darwin
 
       - uses: pnpm/action-setup@v4
         name: Setup pnpm
@@ -47,69 +34,147 @@ jobs:
       - name: Install Dependencies
         run: pnpm i --frozen-lockfile
 
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable # Set this to dtolnay/rust-toolchain@nightly
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
         with:
-          # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          workspaces: ./src-tauri -> target
+
+      - name: Build Tauri app
+        run: |
+          pnpm build --target aarch64-apple-darwin
+          pnpm build --target x86_64-apple-darwin
+          pnpm build --target universal-apple-darwin
+
+      - name: Upload Artifact (macOS, ARM64)
+        uses: actions/upload-artifact@v4
+        if: runner.os == 'macOS'
+        with:
+          name: App-${{ runner.os }}-ARM64-DMG
+          # Building Rust app with cargo specifing target
+          # will create a different folder for each target.
+          # Like `target/aarch64-apple-darwin/release/bundle/dmg/`
+          path: ./src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+
+      - name: Upload Artifact (macOS, X64)
+        uses: actions/upload-artifact@v4
+        if: runner.os == 'macOS'
+        with:
+          name: App-${{ runner.os }}-X64-DMG
+          path: ./src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
+
+      - name: Upload Artifact (macOS, Universal)
+        uses: actions/upload-artifact@v4
+        if: runner.os == 'macOS'
+        with:
+          name: App-${{ runner.os }}-Universal-DMG
+          path: ./src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-pc-windows-msvc
+          - target: aarch64-pc-windows-msvc
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          path: .
+
+      - name: Prepare Rust Targets
+        run: |
+          rustup target add ${{ matrix.target }}
+
+      - uses: pnpm/action-setup@v4
+        name: Setup pnpm
+        # No version specification required as pnpm's version has been
+        # pinned in package.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm # Set this to npm, yarn or pnpm.
+
+      - name: Install Dependencies
+        run: pnpm i --frozen-lockfile
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
           workspaces: ./src-tauri -> target
 
-      - name: Install frontend dependencies
-        # If you don't have `beforeBuildCommand` configured you may want to build your frontend here too.
-        run: pnpm install # change this to npm or pnpm depending on which one you use.
-
       - name: Build Tauri app
-        run: pnpm build ${{ matrix.args }}
+        run: |
+          pnpm build --target ${{ matrix.target }}
 
-      - name: Upload Artifact (macOS)
-        uses: actions/upload-artifact@v4
-        if: runner.os == 'macOS'
-        with:
-          name: App-${{ runner.os }}-${{ matrix.args == '--target aarch64-apple-darwin' && 'ARM64' || 'X64' }}-DMG
-          path: ./src-tauri/target/*/release/bundle/dmg/*.dmg
-      
-      - name: Upload Artifact (Linux, DEB)
-        if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: App-${{ runner.os }}-${{ runner.arch }}-DEB
-          path: ./src-tauri/target/release/bundle/**/*.deb
-      
-      - name: Upload Artifact (Linux, AppImage)
-        if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: App-${{ runner.os }}-${{ runner.arch }}-AppImage
-          path: ./src-tauri/target/release/bundle/**/*.AppImage
-      
-      - name: Upload Artifact (Linux, RPM)
-        if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: App-${{ runner.os }}-${{ runner.arch }}-RPM
-          path: ./src-tauri/target/release/bundle/**/*.rpm
-      
       - name: Upload Artifact (Windows, MSI)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: App-${{ runner.os }}-${{ runner.arch }}-MSI
-          path: ./src-tauri/target/release/bundle/**/*.msi
-      
+          name: App-${{ runner.os }}-${{ matrix.target == 'x86_64-pc-windows-msvc' && 'X64' || 'ARM64' }}-MSI
+          path: ./src-tauri/target/${{matrix.target}}/release/bundle/**/*.msi
+
       - name: Upload Artifact (Windows, NSIS)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: App-${{ runner.os }}-${{ runner.arch }}-NSIS
-          path: ./src-tauri/target/release/bundle/**/*.exe
+          name: App-${{ runner.os }}-${{ matrix.target == 'x86_64-pc-windows-msvc' && 'X64' || 'ARM64' }}-NSIS
+          path: ./src-tauri/target/${{matrix.target}}/release/bundle/**/*.exe
 
       - name: Upload Artifact (Windows, EXE)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: App-${{ runner.os }}-${{ runner.arch }}-EXE
-          path: ./src-tauri/target/release/*.exe
+          name: App-${{ runner.os }}-${{ matrix.target == 'x86_64-pc-windows-msvc' && 'X64' || 'ARM64' }}-EXE
+          path: ./src-tauri/target/${{matrix.target}}/release/*.exe
+
+  build-linux:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+          - target: aarch64-unknown-linux-gnu
+    steps:
+      - name: Prepare Rust Targets
+        run: |
+          rustup target add ${{ matrix.target }}
+
+      - uses: pnpm/action-setup@v4
+        name: Setup pnpm
+        # No version specification required as pnpm's version has been
+        # pinned in package.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm # Set this to npm, yarn or pnpm.
+
+      - name: Install Dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ./src-tauri -> target
+
+      - name: Build Tauri app
+        run: |
+          pnpm build --target ${{ matrix.target }}
+
+      - name: Upload Artifact (Linux, DEB)
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-${{ runner.os }}-${{ matrix.target == 'x86_64-unknown-linux-gnu' && 'X64' || 'ARM64' }}-DEB
+          path: ./src-tauri/${{ matrix.target }}/target/release/bundle/**/*.deb
+
+      - name: Upload Artifact (Linux, RPM)
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-${{ runner.os }}-${{ matrix.target == 'x86_64-unknown-linux-gnu' && 'X64' || 'ARM64' }}-RPM
+          path: ./src-tauri/${{ matrix.target }}/target/release/bundle/**/*.rpm
