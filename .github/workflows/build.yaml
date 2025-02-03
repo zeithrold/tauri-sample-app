@@ -157,20 +157,21 @@ jobs:
         run: |
           echo \
             "
-            deb [arch=armhf,arm64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted
-            deb [arch=armhf,arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted
-            deb [arch=armhf,arm64] http://ports.ubuntu.com/ubuntu-ports jammy universe
-            deb [arch=armhf,arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates universe
-            deb [arch=armhf,arm64] http://ports.ubuntu.com/ubuntu-ports jammy multiverse
-            deb [arch=armhf,arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates multiverse
-            deb [arch=armhf,arm64] http://ports.ubuntu.com/ubuntu-ports jammy-backports main restricted universe multiverse
-            deb [arch=armhf,arm64] http://ports.ubuntu.com/ubuntu-ports jammy-security main restricted
-            deb [arch=armhf,arm64] http://ports.ubuntu.com/ubuntu-ports jammy-security universe
-            deb [arch=armhf,arm64] http://ports.ubuntu.com/ubuntu-ports jammy-security multiverse
-            " | sudo tee -a /etc/apt/sources.list
+            Types: deb
+            URIs: http://ports.ubuntu.com/ubuntu-ports/
+            Suites: jammy jammy-updates jammy-backports
+            Components: main restricted universe multiverse
+            Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+            Types: deb
+            URIs: http://ports.ubuntu.com/ubuntu-ports/
+            Suites: jammy-security
+            Components: main restricted universe multiverse
+            Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+            " | sudo tee -a /etc/apt/sources.list.d/ubuntu-ports.source
 
       - name: Install Linux Dependencies (X64)
-        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
