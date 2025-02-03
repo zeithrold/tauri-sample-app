@@ -184,7 +184,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            pkg-config-aarch64-linux-gnu \
+            pkg-config:arm64 \
             gcc-aarch64-linux-gnu \
 
       - name: Install Linux Dependencies (ARM64, Step 2)
