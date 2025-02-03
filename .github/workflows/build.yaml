@@ -138,6 +138,11 @@ jobs:
           - target: x86_64-unknown-linux-gnu
           - target: aarch64-unknown-linux-gnu
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          path: .
+
       - name: Prepare Rust Targets
         run: |
           rustup target add ${{ matrix.target }}
