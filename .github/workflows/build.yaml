@@ -147,6 +147,11 @@ jobs:
         run: |
           rustup target add ${{ matrix.target }}
 
+      - name: Install Linux Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
       - uses: pnpm/action-setup@v4
         name: Setup pnpm
         # No version specification required as pnpm's version has been
