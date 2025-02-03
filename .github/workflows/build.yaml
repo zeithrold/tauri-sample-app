@@ -179,18 +179,12 @@ jobs:
             librsvg2-dev \
             patchelf
 
-      - name: Install Linux Dependencies (ARM64, Step 1)
+      - name: Install Linux Dependencies (ARM64)
         if: matrix.target == 'aarch64-unknown-linux-gnu'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
             gcc-aarch64-linux-gnu \
-
-      - name: Install Linux Dependencies (ARM64, Step 2)
-        if: matrix.target == 'aarch64-unknown-linux-gnu'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
             libwebkit2gtk-4.1-dev:arm64 \
             libssl-dev:arm64 \
             libappindicator3-dev:arm64 \
@@ -236,11 +230,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: App-${{ runner.os }}-${{ matrix.target == 'x86_64-unknown-linux-gnu' && 'X64' || 'ARM64' }}-DEB
-          path: ./src-tauri/${{ matrix.target }}/target/release/bundle/**/*.deb
+          path: ./src-tauri/target/${{ matrix.target }}/release/bundle/**/*.deb
 
       - name: Upload Artifact (Linux, RPM)
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: App-${{ runner.os }}-${{ matrix.target == 'x86_64-unknown-linux-gnu' && 'X64' || 'ARM64' }}-RPM
-          path: ./src-tauri/${{ matrix.target }}/target/release/bundle/**/*.rpm
+          path: ./src-tauri/target/${{ matrix.target }}/release/bundle/**/*.rpm
