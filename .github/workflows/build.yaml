@@ -155,46 +155,44 @@ jobs:
       - name: Add APT sources
         if: matrix.target == 'aarch64-unknown-linux-gnu'
         run: |
-          echo \
-            "
-              Types: deb
-              URIs: http://azure.archive.ubuntu.com/ubuntu/
-              Suites: jammy
-              Components: main restricted universe
-              Architectures: amd64
+          cat <<EOF | sudo tee /etc/apt/sources.list.d/ubuntu.source
+            Types: deb
+            URIs: http://azure.archive.ubuntu.com/ubuntu/
+            Suites: jammy
+            Components: main restricted universe
+            Architectures: amd64
 
-              Types: deb
-              URIs: http://azure.security.ubuntu.com/ubuntu/
-              Suites: jammy-security
-              Components: main restricted universe
-              Architectures: amd64
+            Types: deb
+            URIs: http://azure.security.ubuntu.com/ubuntu/
+            Suites: jammy-security
+            Components: main restricted universe
+            Architectures: amd64
 
-              Types: deb
-              URIs: http://azure.archive.ubuntu.com/ubuntu/
-              Suites: jammy-updates
-              Components: main restricted universe
-              Architectures: amd64
+            Types: deb
+            URIs: http://azure.archive.ubuntu.com/ubuntu/
+            Suites: jammy-updates
+            Components: main restricted universe
+            Architectures: amd64
 
-              Types: deb
-              URIs: http://azure.ports.ubuntu.com/ubuntu-ports/
-              Suites: jammy
-              Components: main restricted multiverse universe
-              Architectures: arm64
+            Types: deb
+            URIs: http://azure.ports.ubuntu.com/ubuntu-ports/
+            Suites: jammy
+            Components: main restricted multiverse universe
+            Architectures: arm64
 
-              Types: deb
-              URIs: http://azure.ports.ubuntu.com/ubuntu-ports/
-              Suites: jammy-security
-              Components: main restricted multiverse universe
-              Architectures: arm64
+            Types: deb
+            URIs: http://azure.ports.ubuntu.com/ubuntu-ports/
+            Suites: jammy-security
+            Components: main restricted multiverse universe
+            Architectures: arm64
 
-              Types: deb
-              URIs: http://azure.ports.ubuntu.com/ubuntu-ports/
-              Suites: jammy-updates
-              Components: main restricted multiverse universe
-              Architectures: arm64
-
-              " | sudo tee -a /etc/apt/sources.list.d/ubuntu.source
-            sudo rm /etc/apt/sources.list
+            Types: deb
+            URIs: http://azure.ports.ubuntu.com/ubuntu-ports/
+            Suites: jammy-updates
+            Components: main restricted multiverse universe
+            Architectures: arm64
+          EOF
+          sudo rm /etc/apt/sources.list
 
       - name: Install Linux Dependencies (X64)
         if: matrix.target == 'x86_64-unknown-linux-gnu'
