@@ -158,7 +158,7 @@ jobs:
           sudo cat <<EOF > sources.list
             # amd64 repositories
             deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ jammy main restricted universe
-            deb [arch=amd64] http://azure.security.ubuntu.com/ubuntu/ jammy-security main restricted universe
+            deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ jammy-security main restricted universe
             deb [arch=amd64] http://azure.archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe
 
             # arm64 repositories
